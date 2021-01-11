@@ -3,7 +3,13 @@ import urllib.request
 import os
 import psycopg2
 
-from credentials import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET
+# from credentials import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET
+from os import environ
+CONSUMER_KEY = environ['CONSUMER_KEY']
+CONSUMER_SECRET = environ['CONSUMER_SECRET']
+ACCESS_KEY = environ['ACCESS_KEY']
+ACCESS_SECRET = environ['ACCESS_SECRET']
+
 from db_utils import get_random_photo
 con = psycopg2.connect(database="postgres", user="postgres", password="", host="127.0.0.1", port="5432")
 
