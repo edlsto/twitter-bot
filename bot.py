@@ -28,5 +28,5 @@ tweet = summary + " (" + date + ") " + result['pageurl']
 twitter_API.update_status(status=tweet, media_ids=[media.media_id])
 os.remove(f"images/{photo_id}.jpg")
 print("done")
-
+sys.stdout.flush()
 
