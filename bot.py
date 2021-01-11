@@ -10,6 +10,7 @@ CONSUMER_KEY = environ['CONSUMER_KEY']
 CONSUMER_SECRET = environ['CONSUMER_SECRET']
 ACCESS_KEY = environ['ACCESS_KEY']
 ACCESS_SECRET = environ['ACCESS_SECRET']
+DATABASE_URL = os.environ['DATABASE_URL']
 
 from db_utils import get_random_photo
 con = psycopg2.connect(DATABASE_URL, sslmode='require')
