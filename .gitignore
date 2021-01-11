@@ -1,6 +1,7 @@
 env
 credentials.py
 __pycache__/
-scrape.py
+data.py
 *.db
 dbtest.py
+postgres.py
