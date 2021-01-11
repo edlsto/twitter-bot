@@ -12,7 +12,7 @@ ACCESS_KEY = environ['ACCESS_KEY']
 ACCESS_SECRET = environ['ACCESS_SECRET']
 
 from db_utils import get_random_photo
-con = psycopg2.connect(database="postgres", user="postgres", password="", host="127.0.0.1", port="5432")
+con = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
