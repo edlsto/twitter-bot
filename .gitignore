@@ -1,0 +1,6 @@
+env
+credentials.py
+__pycache__/
+scrape.py
+*.db
+dbtest.py
