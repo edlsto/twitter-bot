@@ -20,7 +20,6 @@ auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 
 result = get_random_photo(con)
 photo_id = result["id"]
-print(result['imageurl'])
 urllib.request.urlretrieve(result['imageurl'], f"./{photo_id}.jpg")
 twitter_API = tweepy.API(auth)
 media = twitter_API.media_upload(f"./{photo_id}.jpg")
@@ -29,6 +28,3 @@ date = result["date"].split(" ")[0]
 tweet = summary + " (" + date + ") " + result['pageurl']
 twitter_API.update_status(status=tweet, media_ids=[media.media_id])
 os.remove(f"./{photo_id}.jpg")
-print("done")
-sys.stdout.flush()
-
