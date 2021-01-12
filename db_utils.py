@@ -11,15 +11,28 @@ def create_photo(conn, image):
     print("Table created successfully")
     conn.commit()
 
+def add_shared_photo(conn, id):
+    sql = """
+        INSERT INTO shared_photos (id) VALUES (%s)
+    """
+    cur = conn.cursor()
+    cur.execute(sql, (id, ))
+    print("Record created successfully")
+    conn.commit()
+
 def get_random_photo(conn):
     sql = """ 
-        SELECT COUNT(*) FROM photos
+        SELECT COUNT(*) 
+        FROM photos 
+        WHERE id NOT IN (SELECT id FROM shared_photos)
     """
     cur = conn.cursor()
     cur.execute(sql)
     result = str(cur.fetchone()[0])
     sql = """
-        SELECT * FROM photos OFFSET floor(random()*%s) LIMIT 1;
+        SELECT * 
+        FROM photos WHERE id NOT IN (SELECT id FROM shared_photos)
+        OFFSET floor(random()*%s) LIMIT 1;
     """
     dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     dict_cur.execute(sql, (result,))
@@ -41,3 +54,13 @@ def delete_photo(conn, _id):
     cur.execute(sql, (_id,))
     conn.commit()
     print('deleted')
+
+def get_unshared_photos(conn):
+    sql = """ 
+        SELECT COUNT(*) 
+        FROM photos 
+        WHERE id NOT IN (SELECT id FROM shared_photos)
+    """
+    cur = conn.cursor()
+    cur.execute(sql)
+    return cur.fetchall()
