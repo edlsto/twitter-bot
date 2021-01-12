@@ -22,7 +22,7 @@ auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 
 twitter_API = tweepy.API(auth)
-tweets = twitter_API.user_timeline('colohistory', count=200, include_entities=True, tweet_mode='extended')
+tweets = twitter_API.user_timeline('colohistory', include_entities=True, tweet_mode='extended')
 now = datetime.datetime.now()
 if now.hour % 2 == 0:
     result = get_random_photo(con)
