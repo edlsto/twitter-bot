@@ -21,9 +21,9 @@ auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 result = get_random_photo(con)
 photo_id = result["id"]
 print(result['imageurl'])
-urllib.request.urlretrieve(result['imageurl'], f"./images/{photo_id}.jpg")
+urllib.request.urlretrieve(result['imageurl'], f"./{photo_id}.jpg")
 twitter_API = tweepy.API(auth)
-media = twitter_API.media_upload(f"./images/{photo_id}.jpg")
+media = twitter_API.media_upload(f"./{photo_id}.jpg")
 summary = result["summary"][:200]
 date = result["date"].split(" ")[0]
 tweet = summary + " (" + date + ") " + result['pageurl']
