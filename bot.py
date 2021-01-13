@@ -5,16 +5,20 @@ import psycopg2
 import time
 import datetime
 import re
-
+from db_utils import get_random_photo, add_shared_photo
 # from credentials import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET
 from os import environ
+
 CONSUMER_KEY = environ['CONSUMER_KEY']
 CONSUMER_SECRET = environ['CONSUMER_SECRET']
 ACCESS_KEY = environ['ACCESS_KEY']
 ACCESS_SECRET = environ['ACCESS_SECRET']
 DATABASE_URL = os.environ['DATABASE_URL']
 
-from db_utils import get_random_photo, add_shared_photo
+def get_first_sentence(string):
+    m = re.search('^.*?[\.!;\?](?:\s|$)', string)
+    return m.group(0).strip()
+
 con = psycopg2.connect(DATABASE_URL, sslmode='require')
 # con = psycopg2.connect(database="postgres", user="postgres", password="", host="127.0.0.1", port="5432")
 
@@ -22,10 +26,6 @@ con = psycopg2.connect(DATABASE_URL, sslmode='require')
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 twitter_API = tweepy.API(auth)
-
-def get_first_sentence(string):
-    m = re.search('^.*?[\.!;\?](?:\s|$)', string)
-    return m.group(0).strip()
 
 # Get the user timeline
 tweets = twitter_API.user_timeline('colohistory', include_entities=True, tweet_mode='extended')
