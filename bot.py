@@ -46,7 +46,8 @@ if now.hour % 2 == 0:
     
     # Assemble the tweet
     summary = get_first_sentence(result["summary"][:200])
-    date = result["date"].split(" ")[0]
+    date_raw = result["date"].split(" ")[0]
+    date = re.sub('[\[\]]', '', date_raw)
     tweet = summary + " (" + date + ") " + result['pageurl']
     
     # Add the photo to the shared_photos table in the database
