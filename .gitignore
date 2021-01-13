@@ -5,3 +5,4 @@ data.py
 *.db
 dbtest.py
 postgres.py
+regex.py
