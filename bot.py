@@ -25,7 +25,7 @@ twitter_API = tweepy.API(auth)
 
 def get_first_sentence(string):
     m = re.search('^.*?[\.!;\?](?:\s|$)', string)
-    return m.group(0)
+    return m.group(0).strip()
 
 # Get the user timeline
 tweets = twitter_API.user_timeline('colohistory', include_entities=True, tweet_mode='extended')
