@@ -4,6 +4,7 @@ import os
 import psycopg2
 import time
 import datetime
+import re
 
 # from credentials import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET
 from os import environ
