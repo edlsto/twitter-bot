@@ -1,15 +1,25 @@
 import psycopg2.extras
 
 def create_photo(conn, image):
+    print(image)
     sql = """
-        INSERT INTO photos (id,imageUrl,pageUrl,summary,creator,date) VALUES (%s, %s, %s, %s, %s, %s)
+        INSERT INTO photos (id,imageUrl,pageUrl,summary,creator,date,subject) VALUES (%s, %s, %s, %s, %s, %s, %s)
     """
     cur = conn.cursor()
-    data = (image["id"], image["imageUrl"], image["pageUrl"], image["summary"], image["creator"], image["date"])
-    print(type(data))
+    data = (image["id"], image["imageUrl"], image["pageUrl"], image["summary"], image["creator"], image["date"], image["subject"])
     cur.execute(sql, data)
     print("Table created successfully")
     conn.commit()
+
+def get_photo(conn, id):
+    sql = """
+        SELECT *
+        FROM photos
+        WHERE ID = %s
+    """
+    dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    dict_cur.execute(sql, (id,))
+    return dict_cur.fetchone()
 
 def add_shared_photo(conn, id):
     sql = """
@@ -17,7 +27,6 @@ def add_shared_photo(conn, id):
     """
     cur = conn.cursor()
     cur.execute(sql, (id, ))
-    print("Record created successfully")
     conn.commit()
 
 def get_random_photo(conn):
@@ -54,6 +63,41 @@ def delete_photo(conn, _id):
     cur.execute(sql, (_id,))
     conn.commit()
     print('deleted')
+
+def delete_photo_by_subject(conn, string):
+    search_term = "%" + string + "%"
+    sql = """
+            DELETE FROM photos WHERE subject LIKE %s;
+        """
+    cur = conn.cursor()
+    cur.execute(sql, (search_term,))
+    conn.commit()
+
+def delete_photo_not_include_subject(conn, string):
+    search_term = "%" + string + "%"
+    sql = """
+            DELETE FROM photos WHERE subject NOT LIKE %s;
+        """
+    cur = conn.cursor()
+    cur.execute(sql, (search_term,))
+    conn.commit()
+
+def delete_photo_by_summary(conn, string):
+    search_term = "%" + string + "%"
+    sql = """
+            DELETE FROM photos WHERE summary LIKE %s;
+        """
+    cur = conn.cursor()
+    cur.execute(sql, (search_term,))
+    conn.commit()
+
+def delete_all_shared_photos(conn):
+    sql = """
+            DELETE FROM shared_photos;
+        """
+    cur = conn.cursor()
+    cur.execute(sql)
+    conn.commit()
 
 def get_unshared_photos(conn):
     sql = """ 

@@ -6,3 +6,4 @@ data.py
 dbtest.py
 postgres.py
 regex.py
+clean.py

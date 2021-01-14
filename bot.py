@@ -5,7 +5,7 @@ import psycopg2
 import time
 import datetime
 import re
-from db_utils import get_random_photo, add_shared_photo
+from db_utils import get_random_photo, add_shared_photo, get_photo, delete_all_shared_photos
 # from credentials import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET
 from os import environ
 
@@ -17,7 +17,23 @@ DATABASE_URL = os.environ['DATABASE_URL']
 
 def get_first_sentence(string):
     m = re.search('^.*?[\.!;\?](?:\s|$)', string)
-    return m.group(0).strip()
+    result = m.group(0).strip()
+    s = list(result)
+    if s[-1] == ';':
+        s[-1] = '.'
+    return "".join(s)
+
+def extract_date(string):
+    m = re.findall('(\d{4}\??)', string)
+    if (len(m) == 1):
+        result = m[0]
+    elif (len(m) > 1):
+        result = f"{m[0]}-{m[1]}"
+    else:
+        result = ''
+    if re.findall('(?<=circa )(\d{4})', string):
+        result = 'circa ' + result
+    return f"({result})"
 
 con = psycopg2.connect(DATABASE_URL, sslmode='require')
 # con = psycopg2.connect(database="postgres", user="postgres", password="", host="127.0.0.1", port="5432")
@@ -28,8 +44,14 @@ auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 twitter_API = tweepy.API(auth)
 
 # Get the user timeline
-tweets = twitter_API.user_timeline('colohistory', include_entities=True, tweet_mode='extended')
-
+delete_all_shared_photos(con)
+tweets = twitter_API.user_timeline('colohistory', include_entities=True, tweet_mode='extended', count='3200')
+ids = []
+for tweet in tweets:
+    ids.append(tweet.entities['urls'][0]['expanded_url'].split("/")[-1])
+print(ids)
+for id in ids:
+    add_shared_photo(con, id)
 # Get the current time. Tweet if it's an even hour
 now = datetime.datetime.now()
 if now.hour % 2 == 0:
@@ -43,13 +65,15 @@ if now.hour % 2 == 0:
 
     # Upload the photo to twitter
     media = twitter_API.media_upload(f"./{photo_id}.jpg")
-    
+
     # Assemble the tweet
-    summary = get_first_sentence(result["summary"][:200])
-    date_raw = result["date"].split(" ")[0]
-    date = re.sub('[\[\]]', '', date_raw)
-    tweet = summary + " (" + date + ") " + result['pageurl']
-    
+    date = extract_date(result["date"])
+    summary = get_first_sentence(result["summary"])
+    if len(summary + " " + date) > 280:
+        summary = summary[:277 - (len(date) + 1)] + '...'
+
+    tweet = summary + " " + date + " " + result['pageurl']
+
     # Add the photo to the shared_photos table in the database
     add_shared_photo(con, result["id"])
 
@@ -58,3 +82,5 @@ if now.hour % 2 == 0:
 
     # Remove the photo file
     os.remove(f"./{photo_id}.jpg")
+
+    print(f"Tweet made: {tweet}")
