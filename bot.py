@@ -16,7 +16,7 @@ ACCESS_SECRET = environ['ACCESS_SECRET']
 DATABASE_URL = os.environ['DATABASE_URL']
 
 def get_first_sentence(string):
-    m = re.search('^.*?[\.!;\?](?:\s|$)', string)
+    m = re.search('^.*?[\.!;\?](?:\s|$)(?<=[A-Za-z]{2,}\.\s)', string)
     result = m.group(0).strip()
     s = list(result)
     if s[-1] == ';':
