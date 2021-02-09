@@ -44,20 +44,19 @@ auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 twitter_API = tweepy.API(auth)
 
 # Get the user timeline
-delete_all_shared_photos(con)
-tweets = twitter_API.user_timeline('colohistory', include_entities=True, tweet_mode='extended', count='3200')
+tweets = []
+for status in tweepy.Cursor(twitter_API.user_timeline, screen_name='@colohistory', tweet_mode="extended").items():
+    tweets.append(status)
 ids = []
 for tweet in tweets:
     ids.append(tweet.entities['urls'][0]['expanded_url'].split("/")[-1])
-print(ids)
-for id in ids:
-    add_shared_photo(con, id)
+
 # Get the current time. Tweet if it's an even hour
 now = datetime.datetime.now()
 if now.hour % 2 == 0:
 
     # Get a random photo
-    result = get_random_photo(con)
+    result = get_random_photo(con, ids)
     photo_id = result["id"]
 
     # Download the photo
@@ -73,9 +72,6 @@ if now.hour % 2 == 0:
         summary = summary[:277 - (len(date) + 1)] + '...'
 
     tweet = summary + " " + date + " " + result['pageurl']
-
-    # Add the photo to the shared_photos table in the database
-    add_shared_photo(con, result["id"])
 
     # Tweet
     twitter_API.update_status(status=tweet, media_ids=[media.media_id])

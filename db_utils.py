@@ -1,15 +1,17 @@
 import psycopg2.extras
 
 def create_photo(conn, image):
-    print(image)
-    sql = """
-        INSERT INTO photos (id,imageUrl,pageUrl,summary,creator,date,subject) VALUES (%s, %s, %s, %s, %s, %s, %s)
-    """
-    cur = conn.cursor()
-    data = (image["id"], image["imageUrl"], image["pageUrl"], image["summary"], image["creator"], image["date"], image["subject"])
-    cur.execute(sql, data)
-    print("Table created successfully")
-    conn.commit()
+    try:
+        print(image["id"])
+        sql = """
+            INSERT INTO photos (id,imageUrl,pageUrl,summary,creator,date,subject) VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING
+        """
+        cur = conn.cursor()
+        data = (image["id"], image["imageUrl"], image["pageUrl"], image["summary"], image["creator"], image["date"], image["subject"])
+        cur.execute(sql, data)
+        conn.commit()
+    except Exception as e:
+        print(e)
 
 def get_photo(conn, id):
     sql = """
@@ -29,22 +31,23 @@ def add_shared_photo(conn, id):
     cur.execute(sql, (id, ))
     conn.commit()
 
-def get_random_photo(conn):
-    sql = """ 
-        SELECT COUNT(*) 
-        FROM photos 
-        WHERE id NOT IN (SELECT id FROM shared_photos)
+def get_random_photo(conn, list):
+    sql1 = """
+        SELECT COUNT(*) FROM photos
     """
     cur = conn.cursor()
-    cur.execute(sql)
-    result = str(cur.fetchone()[0])
+    cur.execute(sql1)
+    num = cur.fetchone()
+    result = int(num[0]) - len(list)
+    placeholder= '?' 
+    placeholders= ', '.join(placeholder for unused in list)
     sql = """
         SELECT * 
-        FROM photos WHERE id NOT IN (SELECT id FROM shared_photos)
+        FROM photos WHERE id NOT IN (%s)
         OFFSET floor(random()*%s) LIMIT 1;
     """
     dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    dict_cur.execute(sql, (result,))
+    dict_cur.execute(sql, (placeholders, result))
     return dict_cur.fetchone()
 
 def get_all_photos(conn):
