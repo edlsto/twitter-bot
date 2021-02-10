@@ -5,7 +5,7 @@ import psycopg2
 import time
 import datetime
 import re
-from db_utils import get_random_photo, add_shared_photo, get_photo, delete_all_shared_photos
+from db_utils import get_random_photo
 # from credentials import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET
 from os import environ
 
@@ -16,7 +16,7 @@ ACCESS_SECRET = environ['ACCESS_SECRET']
 DATABASE_URL = os.environ['DATABASE_URL']
 
 def get_first_sentence(string):
-    m = re.search('^.*?[\.!;\?](?:\s|$)(?<=[A-Za-z]{2,2}\.\s)', string)
+    m = re.search('^.*?[\.!;](?:\s|$)(?<=[^ ]{3,3}[\.!;]\s)', string + ' ')
     result = m.group(0).strip()
     s = list(result)
     if s[-1] == ';':

@@ -39,15 +39,11 @@ def get_random_photo(conn, list):
     cur.execute(sql1)
     num = cur.fetchone()
     result = int(num[0]) - len(list)
-    placeholder= '?' 
-    placeholders= ', '.join(placeholder for unused in list)
-    sql = """
-        SELECT * 
-        FROM photos WHERE id NOT IN (%s)
-        OFFSET floor(random()*%s) LIMIT 1;
-    """
+    placeholder= '%s' 
+    placeholders = ', '.join(placeholder for unused in list)
+    sql = "SELECT * FROM photos WHERE id NOT IN (%s) OFFSET floor(random()*%s) LIMIT 1" % (placeholders, result)
     dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    dict_cur.execute(sql, (placeholders, result))
+    dict_cur.execute(sql, list)
     return dict_cur.fetchone()
 
 def get_all_photos(conn):
