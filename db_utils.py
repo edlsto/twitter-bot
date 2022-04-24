@@ -4,10 +4,10 @@ def create_photo(conn, image):
     try:
         print(image["id"])
         sql = """
-            INSERT INTO photos (id,imageUrl,pageUrl,summary,creator,date,subject) VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING
+            INSERT INTO photos (id,imageUrl,pageUrl,summary,format,date,subject) VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING
         """
         cur = conn.cursor()
-        data = (image["id"], image["imageUrl"], image["pageUrl"], image["summary"], image["creator"], image["date"], image["subject"])
+        data = (image["id"], image["imageUrl"], image["pageUrl"], image["summary"], image["formatb"], image["date"], image["subject"])
         cur.execute(sql, data)
         conn.commit()
     except Exception as e:
