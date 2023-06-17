@@ -31,19 +31,14 @@ def add_shared_photo(conn, id):
     cur.execute(sql, (id, ))
     conn.commit()
 
-def get_random_photo(conn, list):
-    sql1 = """
-        SELECT COUNT(*) FROM photos
+def get_random_photo(conn):
+    sql = """
+        SELECT * FROM photos
+        ORDER BY random()
+        LIMIT 1
     """
-    cur = conn.cursor()
-    cur.execute(sql1)
-    num = cur.fetchone()
-    result = int(num[0]) - len(list)
-    placeholder= '%s' 
-    placeholders = ', '.join(placeholder for unused in list)
-    sql = "SELECT * FROM photos WHERE id NOT IN (%s) OFFSET floor(random()*%s) LIMIT 1" % (placeholders, result)
     dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    dict_cur.execute(sql, list)
+    dict_cur.execute(sql)
     return dict_cur.fetchone()
 
 def get_all_photos(conn):
