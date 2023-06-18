@@ -2,7 +2,6 @@ import tweepy
 import requests
 import os
 import psycopg2
-import time
 import datetime
 import re
 from db_utils import get_random_photo
@@ -52,35 +51,36 @@ client = tweepy.Client(
 
 # Get the current time. Tweet if it's an even hour
 now = datetime.datetime.now()
+if now.hour % 2 == 0:
 
-# Get a random photo
-result = get_random_photo(con)
-photo_id = result["id"]
+    # Get a random photo
+    result = get_random_photo(con)
+    photo_id = result["id"]
 
-# Download the photo
-response = requests.get(result['imageurl'])
-if response.status_code == 200:
-    with open(f"./{photo_id}.jpg", 'wb') as file:
-        file.write(response.content)
+    # Download the photo
+    response = requests.get(result['imageurl'])
+    if response.status_code == 200:
+        with open(f"./{photo_id}.jpg", 'wb') as file:
+            file.write(response.content)
 
-# Upload the photo to twitter
-media = twitter_API.media_upload(f"./{photo_id}.jpg")
+    # Upload the photo to twitter
+    media = twitter_API.media_upload(f"./{photo_id}.jpg")
 
-# Assemble the tweet
-date = extract_date(result["date"])
-summary = get_first_sentence(result["summary"])
-if len(summary + " " + date) > 280:
-    summary = summary[:277 - (len(date) + 1)] + '...'
+    # Assemble the tweet
+    date = extract_date(result["date"])
+    summary = get_first_sentence(result["summary"])
+    if len(summary + " " + date) > 280:
+        summary = summary[:277 - (len(date) + 1)] + '...'
 
-tweet = summary + " " + date + " " + result['pageurl']
+    tweet = summary + " " + date + " " + result['pageurl']
 
-# Tweet
-response = client.create_tweet(
-    text=tweet,
-    media_ids=[media.media_id]
-)
+    # Tweet
+    response = client.create_tweet(
+        text=tweet,
+        media_ids=[media.media_id]
+    )
 
-# Remove the photo file
-os.remove(f"./{photo_id}.jpg")
+    # Remove the photo file
+    os.remove(f"./{photo_id}.jpg")
 
-print(f"Tweet made: {tweet}")
+    print(f"Tweet made: {tweet}")
