@@ -1,5 +1,5 @@
 import tweepy
-import urllib.request
+import requests
 import os
 import psycopg2
 import time
@@ -58,7 +58,10 @@ result = get_random_photo(con)
 photo_id = result["id"]
 
 # Download the photo
-urllib.request.urlretrieve(result['imageurl'], f"./{photo_id}.jpg")
+response = requests.get(result['imageurl'])
+if response.status_code == 200:
+    with open(f"./{photo_id}.jpg", 'wb') as file:
+        file.write(response.content)
 
 # Upload the photo to twitter
 media = twitter_API.media_upload(f"./{photo_id}.jpg")
