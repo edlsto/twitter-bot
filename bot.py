@@ -30,7 +30,7 @@ def get_sentences(string):
     result = ""
     char_count = 0
 
-    while char_count <= 276:
+    while char_count <= 270:
         string = string.strip()
         sentence = get_first_sentence(string)
         sentence_length = len(sentence)
