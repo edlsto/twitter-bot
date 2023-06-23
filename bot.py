@@ -30,12 +30,12 @@ def get_sentences(string):
     result = ""
     char_count = 0
 
-    while char_count <= 270:
+    while char_count <= 257:
         string = string.strip()
         sentence = get_first_sentence(string)
         sentence_length = len(sentence)
 
-        if char_count + sentence_length <= 276 and len(string) > 0:
+        if char_count + sentence_length <= 257 and len(string) > 0:
             result += sentence + ' '
             char_count += sentence_length
             string = string.replace(sentence, '', 1)
@@ -96,8 +96,8 @@ if now.hour % 2 == 0:
     # Assemble the tweet
     date = extract_date(result["date"])
     summary = get_sentences(result["summary"])
-    if len(summary + " " + date) > 280:
-        summary = summary[:277 - (len(date) + 1)] + '...'
+    if len(summary + " " + date) > 257:
+        summary = summary[:257 - (len(date  + '...') + 1)]
 
     tweet = summary + " " + date + " " + result['pageurl']
 
