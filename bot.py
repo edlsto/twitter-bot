@@ -16,8 +16,35 @@ DATABASE_URL = os.environ['HEROKU_POSTGRESQL_PINK_URL']
 
 def get_first_sentence(string):
     m = re.search('^.*?[\.!;](?:\s|$)(?<=[^ ]{4,4}[\.!;]\s)', string + ' ')
-    result = m.group(0).strip()
-    s = list(result)
+    if m is not None:
+        result = m.group(0).strip()
+        return result
+    else:
+        return ""
+
+def get_sentences(string):
+    last_character = list(string)[-1]
+    if last_character not in (';', '.', '!'):
+      string = string + '.';
+      
+    result = ""
+    char_count = 0
+
+    while char_count <= 276:
+        string = string.strip()
+        sentence = get_first_sentence(string)
+        sentence_length = len(sentence)
+
+        if char_count + sentence_length <= 276 and len(string) > 0:
+            result += sentence + ' '
+            char_count += sentence_length
+            string = string.replace(sentence, '', 1)
+        else:
+            break
+
+    result.strip()
+
+    result = s = list(result)
     if s[-1] == ';':
         s[-1] = '.'
     return "".join(s)
@@ -68,7 +95,7 @@ if now.hour % 2 == 0:
 
     # Assemble the tweet
     date = extract_date(result["date"])
-    summary = get_first_sentence(result["summary"])
+    summary = get_sentences(result["summary"])
     if len(summary + " " + date) > 280:
         summary = summary[:277 - (len(date) + 1)] + '...'
 
