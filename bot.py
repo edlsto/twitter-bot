@@ -101,6 +101,8 @@ if now.hour % 2 == 0:
 
     tweet = summary + " " + date + " " + result['pageurl']
 
+    print(f"Assembled tweet: {tweet}")
+
     # Tweet
     response = client.create_tweet(
         text=tweet,
