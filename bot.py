@@ -61,6 +61,11 @@ def extract_date(string):
         result = 'circa ' + result
     return f"({result})"
 
+# Function to check if the current date is between December 18th and December 25th
+def is_within_xmas_period():
+    now = datetime.datetime.now()
+    return datetime.datetime(now.year, 12, 18) <= now <= datetime.datetime(now.year, 12, 25)
+
 con = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 # con = psycopg2.connect(database="historic_photos", user="edwardstoner", password="", host="127.0.0.1", port="5432")
@@ -80,8 +85,14 @@ client = tweepy.Client(
 now = datetime.datetime.now()
 if now.hour % 2 == 0:
 
+    # Get a random Christmas photo
+    if now.hour % 4 == 0 and is_within_xmas_period():
+        result = get_random_photo(con, "Christmas")
+
     # Get a random photo
-    result = get_random_photo(con)
+    else:
+        result = get_random_photo(con)
+
     photo_id = result["id"]
 
     # Download the photo

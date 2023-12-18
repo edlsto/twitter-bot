@@ -31,15 +31,28 @@ def add_shared_photo(conn, id):
     cur.execute(sql, (id, ))
     conn.commit()
 
-def get_random_photo(conn):
-    sql = """
-        SELECT * FROM photos
-        ORDER BY random()
-        LIMIT 1
-    """
-    dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    dict_cur.execute(sql)
-    return dict_cur.fetchone()
+def get_random_photo(conn, term=None):
+    if term:
+        sql = """
+            SELECT * FROM photos 
+            WHERE (summary LIKE %s OR subject LIKE %s)
+            ORDER BY random()
+            LIMIT 1
+        """
+        term_with_wildcards = f"%{term}%"
+
+        dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        dict_cur.execute(sql, (term_with_wildcards, term_with_wildcards))
+        return dict_cur.fetchone()
+    else:
+        sql = """
+            SELECT * FROM photos 
+            ORDER BY random()
+            LIMIT 1
+        """
+        dict_cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        dict_cur.execute(sql)
+        return dict_cur.fetchone()
 
 def get_all_photos(conn):
     sql = """
