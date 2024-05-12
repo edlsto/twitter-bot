@@ -34,7 +34,7 @@ def add_shared_photo(conn, id):
 def get_random_photo(conn, term=None):
     if term:
         sql = """
-            SELECT * FROM photos 
+            SELECT * FROM photos_2024 
             WHERE (summary LIKE %s OR subject LIKE %s)
             ORDER BY random()
             LIMIT 1
@@ -46,7 +46,8 @@ def get_random_photo(conn, term=None):
         return dict_cur.fetchone()
     else:
         sql = """
-            SELECT * FROM photos 
+            SELECT * FROM photos_2024
+            WHERE collection LIKE '%Western%' AND subject LIKE '%Colorado%' AND subject NOT LIKE '%Locomotive%'
             ORDER BY random()
             LIMIT 1
         """
