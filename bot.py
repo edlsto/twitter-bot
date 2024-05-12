@@ -4,6 +4,7 @@ import os
 import psycopg2
 import datetime
 import re
+from bs4 import BeautifulSoup
 from db_utils import get_random_photo
 # from credentials import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET
 from os import environ
@@ -49,17 +50,18 @@ def get_sentences(string):
         s[-1] = '.'
     return "".join(s)
 
-def extract_date(string):
-    m = re.findall('(\d{4}\??)', string)
-    if (len(m) == 1):
-        result = m[0]
-    elif (len(m) > 1):
-        result = f"{m[0]}-{m[1]}"
+def extract_date(input_string):
+    if input_string is None:
+        return ''
+    # Split the input string at the first semicolon
+    parts = input_string.split(';', 1)
+    
+    # If there is a semicolon, return the part before it
+    if len(parts) > 1:
+        return f"({parts[0]})"
     else:
-        result = ''
-    if re.findall('(?<=circa )(\d{4})', string):
-        result = 'circa ' + result
-    return f"({result})"
+        # If there is no semicolon, return the original string
+        return f"({input_string})"
 
 # Function to check if the current date is between December 18th and December 25th
 def is_within_xmas_period():
@@ -93,34 +95,58 @@ if now.hour % 2 == 0:
     else:
         result = get_random_photo(con)
 
-    photo_id = result["id"]
+        photo_id = result["nodeid"]
 
-    # Download the photo
-    response = requests.get(result['imageurl'])
-    if response.status_code == 200:
-        with open(f"./{photo_id}.jpg", 'wb') as file:
-            file.write(response.content)
+        image_page_url = f'https://digital.denverlibrary.org/nodes/view/{photo_id}'
 
-    # Upload the photo to twitter
-    media = twitter_API.media_upload(f"./{photo_id}.jpg")
+        image_page = requests.get(image_page_url)
 
-    # Assemble the tweet
-    date = extract_date(result["date"])
-    summary = get_sentences(result["summary"])
-    if len(summary + " " + date) > 257:
-        summary = summary[:257 - (len(date  + '...') + 1)]
+        # Check if the request was successful
+        if image_page.status_code == 200:
+            soup = BeautifulSoup(image_page.content, 'html.parser')
+            
+            viewport_div = soup.find('div', id='viewport')
+            if viewport_div:
+                img_tag = viewport_div.find('img')
+                if img_tag:
+                    idx_value = img_tag.get('idx')
 
-    tweet = summary + " " + date + " " + result['pageurl']
+                    img_url = f'https://digital.denverlibrary.org/assets/display/{idx_value}-max'
 
-    print(f"Assembled tweet: {tweet}")
+                    # Download the photo
+                    response = requests.get(img_url)
+                    if response.status_code == 200:
+                        with open(f"./{idx_value}-max", 'wb') as file:
+                            file.write(response.content)
 
-    # Tweet
-    response = client.create_tweet(
-        text=tweet,
-        media_ids=[media.media_id]
-    )
+                    # Upload the photo to twitter
+                    media = twitter_API.media_upload(f"./{idx_value}-max")
 
-    # Remove the photo file
-    os.remove(f"./{photo_id}.jpg")
+                    # Assemble the tweet
+                    date = extract_date(result["date"])
 
-    print(f"Tweet made: {tweet}")
+                    summary = get_sentences(result["summary"])
+                    if len(summary + " " + date) > 257:
+                        summary = summary[:257 - (len(date  + '...') + 1)]
+
+                    tweet = summary + " " + date + " " + image_page_url
+
+                    print(f"Assembled tweet: {tweet}")
+
+                    # Tweet
+                    response = client.create_tweet(
+                        text=tweet,
+                        media_ids=[media.media_id]
+                    )
+
+                    # Remove the photo file
+                    os.remove(f"./{idx_value}-max")
+
+                    print(f"Tweet made: {tweet}")
+
+                else:
+                    print("No img tag found within viewport div.")
+            else:
+                print("Viewport div not found.")
+        else:
+            print("Failed to retrieve the webpage. Status code:", image_page.status_code)
