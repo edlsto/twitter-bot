@@ -7,3 +7,10 @@ dbtest.py
 postgres.py
 regex.py
 clean.py
+CSVs/
+merged/
+get_unique.py
+new-data.py
+save_to_db.py
+spreadsheet-merger.py
+test.py
