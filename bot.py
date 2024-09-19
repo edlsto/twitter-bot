@@ -13,7 +13,7 @@ CONSUMER_KEY = environ['CONSUMER_KEY']
 CONSUMER_SECRET = environ['CONSUMER_SECRET']
 ACCESS_KEY = environ['ACCESS_KEY']
 ACCESS_SECRET = environ['ACCESS_SECRET']
-DATABASE_URL = os.environ['HEROKU_POSTGRESQL_PINK_URL']
+DATABASE_URL = os.environ['DATABASE_URL']
 
 def get_first_sentence(string):
     m = re.search('^.*?[\.!;](?:\s|$)(?<=[^ ]{4,4}[\.!;]\s)', string + ' ')
