@@ -85,68 +85,67 @@ client = tweepy.Client(
 
 # Get the current time. Tweet if it's an even hour
 now = datetime.datetime.now()
-if now.hour % 2 == 0:
 
-    # Get a random Christmas photo
-    if now.hour % 4 == 0 and is_within_xmas_period():
-        result = get_random_photo(con, "Christmas")
+# Get a random Christmas photo
+if now.hour % 4 == 0 and is_within_xmas_period():
+    result = get_random_photo(con, "Christmas")
 
-    # Get a random photo
-    else:
-        result = get_random_photo(con)
+# Get a random photo
+else:
+    result = get_random_photo(con)
 
-        photo_id = result["nodeid"]
+    photo_id = result["nodeid"]
 
-        image_page_url = f'https://digital.denverlibrary.org/nodes/view/{photo_id}'
+    image_page_url = f'https://digital.denverlibrary.org/nodes/view/{photo_id}'
 
-        image_page = requests.get(image_page_url)
+    image_page = requests.get(image_page_url)
 
-        # Check if the request was successful
-        if image_page.status_code == 200:
-            soup = BeautifulSoup(image_page.content, 'html.parser')
-            
-            viewport_div = soup.find('div', id='viewport')
-            if viewport_div:
-                img_tag = viewport_div.find('img')
-                if img_tag:
-                    idx_value = img_tag.get('idx')
+    # Check if the request was successful
+    if image_page.status_code == 200:
+        soup = BeautifulSoup(image_page.content, 'html.parser')
+        
+        viewport_div = soup.find('div', id='viewport')
+        if viewport_div:
+            img_tag = viewport_div.find('img')
+            if img_tag:
+                idx_value = img_tag.get('idx')
 
-                    img_url = f'https://digital.denverlibrary.org/assets/display/{idx_value}-max'
+                img_url = f'https://digital.denverlibrary.org/assets/display/{idx_value}-max'
 
-                    # Download the photo
-                    response = requests.get(img_url)
-                    if response.status_code == 200:
-                        with open(f"./{idx_value}-max", 'wb') as file:
-                            file.write(response.content)
+                # Download the photo
+                response = requests.get(img_url)
+                if response.status_code == 200:
+                    with open(f"./{idx_value}-max", 'wb') as file:
+                        file.write(response.content)
 
-                    # Upload the photo to twitter
-                    media = twitter_API.media_upload(f"./{idx_value}-max")
+                # Upload the photo to twitter
+                media = twitter_API.media_upload(f"./{idx_value}-max")
 
-                    # Assemble the tweet
-                    date = extract_date(result["date"])
+                # Assemble the tweet
+                date = extract_date(result["date"])
 
-                    summary = get_sentences(result["summary"])
-                    if len(summary + " " + date) > 257:
-                        summary = summary[:257 - (len(date  + '...') + 1)]
+                summary = get_sentences(result["summary"])
+                if len(summary + " " + date) > 257:
+                    summary = summary[:257 - (len(date  + '...') + 1)]
 
-                    tweet = summary + " " + date + " " + image_page_url
+                tweet = summary + " " + date + " " + image_page_url
 
-                    print(f"Assembled tweet: {tweet}")
+                print(f"Assembled tweet: {tweet}")
 
-                    # Tweet
-                    response = client.create_tweet(
-                        text=tweet,
-                        media_ids=[media.media_id]
-                    )
+                # Tweet
+                response = client.create_tweet(
+                    text=tweet,
+                    media_ids=[media.media_id]
+                )
 
-                    # Remove the photo file
-                    os.remove(f"./{idx_value}-max")
+                # Remove the photo file
+                os.remove(f"./{idx_value}-max")
 
-                    print(f"Tweet made: {tweet}")
+                print(f"Tweet made: {tweet}")
 
-                else:
-                    print("No img tag found within viewport div.")
             else:
-                print("Viewport div not found.")
+                print("No img tag found within viewport div.")
         else:
-            print("Failed to retrieve the webpage. Status code:", image_page.status_code)
+            print("Viewport div not found.")
+    else:
+        print("Failed to retrieve the webpage. Status code:", image_page.status_code)
