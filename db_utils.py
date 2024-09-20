@@ -47,7 +47,6 @@ def get_random_photo(conn, term=None):
     else:
         sql = """
             SELECT * FROM photos_2024
-            WHERE collection LIKE '%Western%' AND subject LIKE '%Colorado%' AND subject NOT LIKE '%Locomotive%'
             ORDER BY random()
             LIMIT 1
         """
