@@ -1,6 +1,8 @@
 import psycopg2.extras
 import logging
 
+logging.basicConfig(level=logging.INFO)
+
 def get_random_photo(conn, term=None):
     try:
         if term:
