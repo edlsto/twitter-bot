@@ -4,6 +4,7 @@ import os
 import psycopg2
 import datetime
 import re
+import logging
 from bs4 import BeautifulSoup
 from db_utils import get_random_photo
 # from credentials import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET
@@ -23,6 +24,10 @@ CONSUMER_SECRET = get_env_var('CONSUMER_SECRET')
 ACCESS_KEY = get_env_var('ACCESS_KEY')
 ACCESS_SECRET = get_env_var('ACCESS_SECRET')
 DATABASE_URL = get_env_var('DATABASE_URL')
+
+tweet_max_length = 280
+url_length = 23
+description_max_length = tweet_max_length - url_length;
 
 def get_first_sentence(string):
     m = re.search('^.*?[\.!;](?:\s|$)(?<=[^ ]{4,4}[\.!;]\s)', string + ' ')
@@ -77,8 +82,22 @@ def is_within_xmas_period():
     now = datetime.datetime.now()
     return datetime.datetime(now.year, 12, 18) <= now <= datetime.datetime(now.year, 12, 25)
 
-con = psycopg2.connect(DATABASE_URL, sslmode='require')
+def post_tweet_with_photo(image_page_url, summary, date, twitter_API, client, media_file):
+    try:
+        media = twitter_API.media_upload(media_file)
+        tweet = f"{summary} {date} {image_page_url}"
+        response = client.create_tweet(text=tweet, media_ids=[media.media_id])
+        logging.info(f"Tweet made: {tweet}")
+        return response
+    except Exception as e:
+        logging.error(f"Error posting tweet: {e}")
+        return None
 
+try:
+    con = psycopg2.connect(DATABASE_URL, sslmode='require')
+except Exception as e:
+    logging.error(f"Database connection error: {e}")
+    raise
 # con = psycopg2.connect(database="historic_photos", user="edwardstoner", password="", host="127.0.0.1", port="5432")
 
 #v1 auth
@@ -104,9 +123,7 @@ else:
     result = get_random_photo(con)
 
     photo_id = result["nodeid"]
-
     image_page_url = f'https://digital.denverlibrary.org/nodes/view/{photo_id}'
-
     image_page = requests.get(image_page_url)
 
     # Check if the request was successful
@@ -122,47 +139,32 @@ else:
                 img_url = f'https://digital.denverlibrary.org/assets/display/{idx_value}-max'
 
                 # Download the photo
-                response = requests.get(img_url)
-                if response.status_code == 200:
-                    with open(f"./{idx_value}-max", 'wb') as file:
-                        file.write(response.content)
+                try:
+                    response = requests.get(img_url)
+                    if response.status_code == 200:
+                        with open(f"./{idx_value}-max", 'wb') as file:
+                            file.write(response.content)
 
-                # Upload the photo to twitter
-                media = twitter_API.media_upload(f"./{idx_value}-max")
+                    # Assemble the tweet
+                    date = extract_date(result["date"])
 
-                # Assemble the tweet
-                date = extract_date(result["date"])
+                    # add the length of the date, plus a space before and after date
+                    summary_max_length = description_max_length - (len(date) + 2)
+                    summary = get_sentences(result["summary"], summary_max_length)
+                    
+                    if len(summary) > summary_max_length:
+                        summary = summary[:summary_max_length]
 
-                tweet_max_length = 280
-                url_length = 23
-                description_max_length = tweet_max_length - url_length;
-
-                # add the length of the date, plus a space before and after date
-                summary_max_length = description_max_length - (len(date) + 2)
-
-                summary = get_sentences(result["summary"], summary_max_length)
+                    post_tweet_with_photo(image_url, summary, date, twitter_API, client, f"./{idx_value}-max")
                 
-                if len(summary) > summary_max_length:
-                    summary = summary[:summary_max_length]
-
-                tweet = summary + " " + date + " " + image_page_url
-
-                print(f"Assembled tweet: {tweet}")
-
-                # Tweet
-                response = client.create_tweet(
-                    text=tweet,
-                    media_ids=[media.media_id]
-                )
-
-                # Remove the photo file
-                os.remove(f"./{idx_value}-max")
-
-                print(f"Tweet made: {tweet}")
+                finally:
+                    if os.path.exists(f"./{idx_value}-max"):
+                        os.remove(f"./{idx_value}-max")
+                        logging.info(f"Removed file: ./{idx_value}-max")
 
             else:
-                print("No img tag found within viewport div.")
+                logging.warning("No img tag found within viewport div.")
         else:
-            print("Viewport div not found.")
+            logging.warning("Viewport div not found.")
     else:
-        print("Failed to retrieve the webpage. Status code:", image_page.status_code)
+        logging.error("Failed to retrieve the webpage. Status code:", image_page.status_code)
