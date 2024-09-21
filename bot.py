@@ -8,7 +8,7 @@ import logging
 from bs4 import BeautifulSoup
 from db_utils import get_random_photo, record_posted_image
 from string_utils import get_first_sentence, get_sentences, extract_date
-from date_utils import is_within_xmas_period
+from date_utils import get_current_holiday
 # from credentials import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET
 from os import environ
 
