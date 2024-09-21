@@ -44,8 +44,6 @@ def post_tweet_with_photo(post_data, twitter_API, client, con):
         response = client.create_tweet(text=tweet, media_ids=[media.media_id])
         logging.info(f"Tweet made: {tweet}")
 
-        record_posted_image(con, photo_id)
-
         return response
     except Exception as e:
         logging.error(f"Error posting tweet: {e}")
@@ -81,6 +79,13 @@ def download_image(img_url, idx_value):
         logging.error(f"Error downloading image: {e}")
         return False
 
+def is_holiday_image(photo):
+    holidays_keywords = ["Christmas", "Halloween", "New Year's", "Easter", "Fourth of July", "Thanksgiving"]
+    summary = photo.get('summary', '').lower()
+    subject = photo.get('subject', '').lower()
+    
+    return any(holiday.lower() in summary or holiday.lower() in subject for holiday in holidays_keywords)
+
 def main():
     try:
         con = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -114,7 +119,12 @@ def main():
             result = get_random_photo(con)
             logging.info("Posting regular tweet.")
     else:
-        result = get_random_photo(con)
+        # Non-holiday period: exclude holiday-related images
+        while True:
+            result = get_random_photo(con)
+            if result and not is_holiday_image(result):  # Check if the image is NOT holiday-related
+                break  # Only proceed if it's not a holiday-related image
+            logging.info("Skipping holiday image for regular tweet.")
 
     # Check if a result was returned
     if result is None:
@@ -122,6 +132,9 @@ def main():
     else:
         photo_id = result["nodeid"]
         image_page_url = f'https://digital.denverlibrary.org/nodes/view/{photo_id}'
+
+        if not holiday:
+            insert_posted_image(con, photo_id)
 
         # Fetch the image page content
         image_page_content = fetch_image_page(image_page_url)
