@@ -1,4 +1,5 @@
 import psycopg2.extras
+import logging
 
 def get_random_photo(conn, term=None):
     try:
