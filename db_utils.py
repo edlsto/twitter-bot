@@ -8,7 +8,7 @@ def get_random_photo(conn, term=None):
         if term:
             sql = """
                 SELECT * FROM photos_2024 
-                WHERE (summary LIKE %s OR subject LIKE %s) AND nodeid NOT IN (SELECT nodeid FROM posted_images) AND NOT (date ~ '(20[0-2][0-9]|20[0-9])')
+                WHERE (summary LIKE %s OR subject LIKE %s) AND nodeid NOT IN (SELECT nodeid FROM posted_images) AND NOT (date ~ '20[0-9]{2}')
                 ORDER BY random()
                 LIMIT 1
             """
@@ -16,7 +16,7 @@ def get_random_photo(conn, term=None):
         else:
             sql = """
                 SELECT * FROM photos_2024
-                WHERE nodeid NOT IN (SELECT nodeid FROM posted_images) AND NOT (date ~ '(20[0-2][0-9]|20[0-9])')
+                WHERE nodeid NOT IN (SELECT nodeid FROM posted_images) AND NOT (date ~ '20[0-9]{2}')
                 ORDER BY random()
                 LIMIT 1
             """
