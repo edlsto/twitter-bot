@@ -7,6 +7,8 @@ import re
 import logging
 from bs4 import BeautifulSoup
 from db_utils import get_random_photo
+from string_utils import get_first_sentence, get_sentences, extract_date
+from date_utils import is_within_xmas_period
 # from credentials import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET
 from os import environ
 
@@ -25,61 +27,9 @@ ACCESS_KEY = get_env_var('ACCESS_KEY')
 ACCESS_SECRET = get_env_var('ACCESS_SECRET')
 DATABASE_URL = get_env_var('DATABASE_URL')
 
-tweet_max_length = 280
-url_length = 23
-description_max_length = tweet_max_length - url_length;
-
-def get_first_sentence(string):
-    m = re.search('^.*?[\.!;](?:\s|$)(?<=[^ ]{4,4}[\.!;]\s)', string + ' ')
-    if m is not None:
-        result = m.group(0).strip()
-        return result
-    else:
-        return ""
-
-def get_sentences(string, max_length):
-    last_character = list(string)[-1]
-    if last_character not in (';', '.', '!'):
-      string = string + '.';
-      
-    result = ""
-    char_count = 0
-
-    while char_count <= max_length:
-        string = string.strip()
-        sentence = get_first_sentence(string)
-        sentence_length = len(sentence)
-
-        if char_count + sentence_length <= max_length and len(string) > 0:
-            result += sentence + ' '
-            char_count += sentence_length
-            string = string.replace(sentence, '', 1)
-        else:
-            break
-
-    result = result.strip()
-
-    result = s = list(result)
-    if s[-1] == ';':
-        s[-1] = '.'
-    return "".join(s)
-
-def extract_date(input_string):
-    if input_string is None:
-        return ''
-    # Split the input string at the first semicolon
-    parts = input_string.split(';', 1)
-    
-    # If there is a semicolon, return the part before it
-    if len(parts) > 1:
-        return f"({parts[0]})"
-    else:
-        # If there is no semicolon, return the original string
-        return f"({input_string})"
-
-def is_within_xmas_period():
-    now = datetime.datetime.now()
-    return datetime.datetime(now.year, 12, 18) <= now <= datetime.datetime(now.year, 12, 25)
+TWEET_MAX_LENGTH = 280
+URL_LENGTH = 23
+DESCRIPTION_MAX_LENGTH = TWEET_MAX_LENGTH - URL_LENGTH
 
 def post_tweet_with_photo(image_page_url, summary, date, twitter_API, client, media_file):
     try:
@@ -113,11 +63,8 @@ client = tweepy.Client(
 # Get the current time. Tweet if it's an even hour
 now = datetime.datetime.now()
 
-# Get a random Christmas photo
 if now.hour % 4 == 0 and is_within_xmas_period():
     result = get_random_photo(con, "Christmas")
-
-# Get a random photo
 else:
     result = get_random_photo(con)
 
@@ -147,7 +94,7 @@ else:
                     date = extract_date(result["date"])
 
                     # add the length of the date, plus a space before and after date
-                    summary_max_length = description_max_length - (len(date) + 2)
+                    summary_max_length = DESCRIPTION_MAX_LENGTH - (len(date) + 2)
                     summary = get_sentences(result["summary"], summary_max_length)
 
                     post_tweet_with_photo(img_url, summary, date, twitter_API, client, f"./{idx_value}-max")
