@@ -9,11 +9,20 @@ from db_utils import get_random_photo
 # from credentials import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET
 from os import environ
 
-CONSUMER_KEY = environ['CONSUMER_KEY']
-CONSUMER_SECRET = environ['CONSUMER_SECRET']
-ACCESS_KEY = environ['ACCESS_KEY']
-ACCESS_SECRET = environ['ACCESS_SECRET']
-DATABASE_URL = os.environ['DATABASE_URL']
+logging.basicConfig(level=logging.INFO)
+
+def get_env_var(name):
+    value = os.environ.get(name)
+    if value is None:
+        logging.error(f"Missing environment variable: {name}")
+        raise EnvironmentError(f"Missing environment variable: {name}")
+    return value
+
+CONSUMER_KEY = get_env_var('CONSUMER_KEY')
+CONSUMER_SECRET = get_env_var('CONSUMER_SECRET')
+ACCESS_KEY = get_env_var('ACCESS_KEY')
+ACCESS_SECRET = get_env_var('ACCESS_SECRET')
+DATABASE_URL = get_env_var('DATABASE_URL')
 
 def get_first_sentence(string):
     m = re.search('^.*?[\.!;](?:\s|$)(?<=[^ ]{4,4}[\.!;]\s)', string + ' ')
@@ -23,7 +32,7 @@ def get_first_sentence(string):
     else:
         return ""
 
-def get_sentences(string):
+def get_sentences(string, max_length):
     last_character = list(string)[-1]
     if last_character not in (';', '.', '!'):
       string = string + '.';
@@ -31,19 +40,19 @@ def get_sentences(string):
     result = ""
     char_count = 0
 
-    while char_count <= 257:
+    while char_count <= max_length:
         string = string.strip()
         sentence = get_first_sentence(string)
         sentence_length = len(sentence)
 
-        if char_count + sentence_length <= 257 and len(string) > 0:
+        if char_count + sentence_length <= max_length and len(string) > 0:
             result += sentence + ' '
             char_count += sentence_length
             string = string.replace(sentence, '', 1)
         else:
             break
 
-    result.strip()
+    result = result.strip()
 
     result = s = list(result)
     if s[-1] == ';':
@@ -124,9 +133,17 @@ else:
                 # Assemble the tweet
                 date = extract_date(result["date"])
 
-                summary = get_sentences(result["summary"])
-                if len(summary + " " + date) > 257:
-                    summary = summary[:257 - (len(date  + '...') + 1)]
+                tweet_max_length = 280
+                url_length = 23
+                description_max_length = tweet_max_length - url_length;
+
+                # add the length of the date, plus a space before and after date
+                summary_max_length = description_max_length - (len(date) + 2)
+
+                summary = get_sentences(result["summary"], summary_max_length)
+                
+                if len(summary) > summary_max_length:
+                    summary = summary[:summary_max_length]
 
                 tweet = summary + " " + date + " " + image_page_url
 
