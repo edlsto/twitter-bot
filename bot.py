@@ -105,7 +105,7 @@ def main():
     holiday = get_current_holiday()
 
     if holiday:
-        if now.hour % 4 == 0
+        if now.hour % 4 == 0:
             result = get_random_photo(con, holiday)
             logging.info(f"Posting holiday tweet for {holiday}.")
             if result is None:
