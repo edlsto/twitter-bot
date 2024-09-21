@@ -102,10 +102,24 @@ def main():
 
     now = datetime.datetime.now()
 
-    if now.hour % 4 == 0 and is_within_xmas_period():
-        result = get_random_photo(con, "Christmas")
+    holiday = get_current_holiday()
+
+    if holiday:
+        if now.hour % 4 == 0
+            result = get_random_photo(con, holiday)
+            logging.info(f"Posting holiday tweet for {holiday}.")
+            if result is None:
+                result = get_random_photo(con, holiday)
+        else:
+            result = get_random_photo(con)
+            logging.info("Posting regular tweet.")
     else:
         result = get_random_photo(con)
+
+    # Check if a result was returned
+    if result is None:
+        logging.warning("No photo found to post.")
+    else:
         photo_id = result["nodeid"]
         image_page_url = f'https://digital.denverlibrary.org/nodes/view/{photo_id}'
 
@@ -133,7 +147,7 @@ def main():
                     }
 
                     post_tweet_with_photo(post_data, twitter_API, client, con)           
-                         
+                            
                     os.remove(f"./{idx_value}-max")
                     logging.info(f"Removed file: ./{idx_value}-max")
 
