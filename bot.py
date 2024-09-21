@@ -146,8 +146,8 @@ def main():
                         'photo_id': photo_id
                     }
 
-                    post_tweet_with_photo(post_data, twitter_API, client, con)           
-                            
+                    post_tweet_with_photo(post_data, twitter_API, client, con)
+
                     os.remove(f"./{idx_value}-max")
                     logging.info(f"Removed file: ./{idx_value}-max")
 
