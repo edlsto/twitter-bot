@@ -1,3 +1,5 @@
+import re
+
 def get_first_sentence(string):
     m = re.search('^.*?[\.!;](?:\s|$)(?<=[^ ]{4,4}[\.!;]\s)', string + ' ')
     if m is not None:
