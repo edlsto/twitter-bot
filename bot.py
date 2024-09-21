@@ -39,12 +39,12 @@ def post_tweet_with_photo(post_data, twitter_API, client, con):
     photo_id = post_data['photo_id']
     
     try:
-        media = twitter_API.media_upload(media_file)
+        media = twitter_API.media_upload(image_path)
         tweet = f"{summary} {date} {image_page_url}"
         response = client.create_tweet(text=tweet, media_ids=[media.media_id])
         logging.info(f"Tweet made: {tweet}")
 
-        record_posted_image(con, nodeid)
+        record_posted_image(con, photo_id)
 
         return response
     except Exception as e:
