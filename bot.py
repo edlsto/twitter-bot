@@ -31,12 +31,21 @@ TWEET_MAX_LENGTH = 280
 URL_LENGTH = 23
 DESCRIPTION_MAX_LENGTH = TWEET_MAX_LENGTH - URL_LENGTH
 
-def post_tweet_with_photo(image_page_url, summary, date, twitter_API, client, media_file):
+def post_tweet_with_photo(post_data, twitter_API, client, con):
+    image_page_url = post_data['image_page_url']
+    summary = post_data['summary']
+    date = post_data['date']
+    image_path = post_data['image_path']
+    photo_id = post_data['photo_id']
+    
     try:
         media = twitter_API.media_upload(media_file)
         tweet = f"{summary} {date} {image_page_url}"
         response = client.create_tweet(text=tweet, media_ids=[media.media_id])
         logging.info(f"Tweet made: {tweet}")
+
+        record_posted_image(con, nodeid)
+
         return response
     except Exception as e:
         logging.error(f"Error posting tweet: {e}")
@@ -115,8 +124,16 @@ def main():
                     summary_max_length = DESCRIPTION_MAX_LENGTH - (len(date) + 2)
                     summary = get_sentences(result["summary"], summary_max_length)
 
-                    post_tweet_with_photo(image_page_url, summary, date, twitter_API, client, f"./{idx_value}-max")
-                
+                    post_data = {
+                        'image_page_url': image_page_url,
+                        'summary': summary,
+                        'date': date,
+                        'image_path': f"./{idx_value}-max",
+                        'photo_id': photo_id
+                    }
+
+                    post_tweet_with_photo(post_data, twitter_API, client, con)           
+                         
                     os.remove(f"./{idx_value}-max")
                     logging.info(f"Removed file: ./{idx_value}-max")
 
