@@ -115,7 +115,7 @@ def main():
                     summary_max_length = DESCRIPTION_MAX_LENGTH - (len(date) + 2)
                     summary = get_sentences(result["summary"], summary_max_length)
 
-                    post_tweet_with_photo(img_page_url, summary, date, twitter_API, client, f"./{idx_value}-max")
+                    post_tweet_with_photo(image_page_url, summary, date, twitter_API, client, f"./{idx_value}-max")
                 
                     os.remove(f"./{idx_value}-max")
                     logging.info(f"Removed file: ./{idx_value}-max")
