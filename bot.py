@@ -155,7 +155,7 @@ else:
                     if len(summary) > summary_max_length:
                         summary = summary[:summary_max_length]
 
-                    post_tweet_with_photo(image_url, summary, date, twitter_API, client, f"./{idx_value}-max")
+                    post_tweet_with_photo(img_url, summary, date, twitter_API, client, f"./{idx_value}-max")
                 
                 finally:
                     if os.path.exists(f"./{idx_value}-max"):
