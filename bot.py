@@ -42,6 +42,36 @@ def post_tweet_with_photo(image_page_url, summary, date, twitter_API, client, me
         logging.error(f"Error posting tweet: {e}")
         return None
 
+def fetch_image_page(image_page_url):
+    try:
+        response = requests.get(image_page_url)
+        response.raise_for_status()
+        return response.content
+    except requests.RequestException as e:
+        logging.error(f"Error fetching image page: {e}")
+        return None
+
+def get_image_url(image_page_content):
+    soup = BeautifulSoup(image_page_content, 'html.parser')
+    viewport_div = soup.find('div', id='viewport')
+    if viewport_div:
+        img_tag = viewport_div.find('img')
+        if img_tag:
+            return f'https://digital.denverlibrary.org/assets/display/{img_tag.get("idx")}-max'
+    logging.warning("Image tag or viewport div not found.")
+    return None
+
+def download_image(img_url, idx_value):
+    try:
+        response = requests.get(img_url)
+        response.raise_for_status()
+        with open(f"./{idx_value}-max", 'wb') as file:
+            file.write(response.content)
+        return True
+    except requests.RequestException as e:
+        logging.error(f"Error downloading image: {e}")
+        return False
+
 def main():
     try:
         con = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -67,49 +97,28 @@ def main():
         result = get_random_photo(con, "Christmas")
     else:
         result = get_random_photo(con)
-
         photo_id = result["nodeid"]
         image_page_url = f'https://digital.denverlibrary.org/nodes/view/{photo_id}'
-        image_page = requests.get(image_page_url)
 
-        # Check if the request was successful
-        if image_page.status_code == 200:
-            soup = BeautifulSoup(image_page.content, 'html.parser')
-            
-            viewport_div = soup.find('div', id='viewport')
-            if viewport_div:
-                img_tag = viewport_div.find('img')
-                if img_tag:
-                    idx_value = img_tag.get('idx')
+        # Fetch the image page content
+        image_page_content = fetch_image_page(image_page_url)
+        if image_page_content:
+            img_url = get_image_url(image_page_content)
+            if img_url:
+                idx_value = img_url.split('-')[1]  # Extract idx_value from the URL
+                
+                # Download the photo
+                if download_image(img_url, idx_value):
+                    date = extract_date(result["date"])
 
-                    img_url = f'https://digital.denverlibrary.org/assets/display/{idx_value}-max'
+                    # add the length of the date, plus a space before and after date
+                    summary_max_length = DESCRIPTION_MAX_LENGTH - (len(date) + 2)
+                    summary = get_sentences(result["summary"], summary_max_length)
 
-                    # Download the photo
-                    try:
-                        response = requests.get(img_url)
-                        if response.status_code == 200:
-                            with open(f"./{idx_value}-max", 'wb') as file:
-                                file.write(response.content)
-
-                        date = extract_date(result["date"])
-
-                        # add the length of the date, plus a space before and after date
-                        summary_max_length = DESCRIPTION_MAX_LENGTH - (len(date) + 2)
-                        summary = get_sentences(result["summary"], summary_max_length)
-
-                        post_tweet_with_photo(img_page_url, summary, date, twitter_API, client, f"./{idx_value}-max")
-                    
-                    finally:
-                        if os.path.exists(f"./{idx_value}-max"):
-                            os.remove(f"./{idx_value}-max")
-                            logging.info(f"Removed file: ./{idx_value}-max")
-
-                else:
-                    logging.warning("No img tag found within viewport div.")
-            else:
-                logging.warning("Viewport div not found.")
-        else:
-            logging.error("Failed to retrieve the webpage. Status code:", image_page.status_code)
+                    post_tweet_with_photo(img_page_url, summary, date, twitter_API, client, f"./{idx_value}-max")
+                
+                    os.remove(f"./{idx_value}-max")
+                    logging.info(f"Removed file: ./{idx_value}-max")
 
 if __name__ == "__main__":
     main()
