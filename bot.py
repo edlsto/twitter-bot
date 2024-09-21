@@ -77,7 +77,6 @@ def extract_date(input_string):
         # If there is no semicolon, return the original string
         return f"({input_string})"
 
-# Function to check if the current date is between December 18th and December 25th
 def is_within_xmas_period():
     now = datetime.datetime.now()
     return datetime.datetime(now.year, 12, 18) <= now <= datetime.datetime(now.year, 12, 25)
@@ -145,15 +144,11 @@ else:
                         with open(f"./{idx_value}-max", 'wb') as file:
                             file.write(response.content)
 
-                    # Assemble the tweet
                     date = extract_date(result["date"])
 
                     # add the length of the date, plus a space before and after date
                     summary_max_length = description_max_length - (len(date) + 2)
                     summary = get_sentences(result["summary"], summary_max_length)
-                    
-                    if len(summary) > summary_max_length:
-                        summary = summary[:summary_max_length]
 
                     post_tweet_with_photo(img_url, summary, date, twitter_API, client, f"./{idx_value}-max")
                 
