@@ -9,6 +9,7 @@ on:
 jobs:
   post_twitter_photo:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
 
     steps:
       - name: Checkout repository
