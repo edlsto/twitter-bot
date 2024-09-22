@@ -157,7 +157,6 @@ def main():
                     summary_max_length = DESCRIPTION_MAX_LENGTH - (len(date) + 2)
 
                     try:
-                        # Check if the summary is greater than 257 characters
                         if len(result["summary"]) > summary_max_length:
                             if use_ai:
                                 # Attempt to generate a tweet summary using the OpenAI API
