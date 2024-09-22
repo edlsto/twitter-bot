@@ -16,7 +16,7 @@ def generate_tweet_summary(nodetitle, summary, max_length=253):
             messages=[
                 {"role": "user", "content": prompt}
             ],
-            model="gpt-3.5-turbo"
+            model="gpt-4"
         )
 
         tweet_summary = response.choices[0].message.content.strip()
