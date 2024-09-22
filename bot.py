@@ -128,6 +128,14 @@ def main():
         # Non-holiday period: exclude holiday-related images
         while True:
             result = get_random_photo(con)
+
+            if result is None:
+                logging.warning("No result found, breaking out of the loop.")
+                break  # Exit loop if no result is found
+
+            summary = result["summary"]
+            id = result["nodeid"]
+            logging.info(f"Random photo summary (photo id: {id}): {summary}")
             if result and not is_holiday_image(result):  # Check if the image is NOT holiday-related
                 break  # Only proceed if it's not a holiday-related image
             logging.info("Skipping holiday image for regular tweet.")
@@ -136,9 +144,6 @@ def main():
     if result is None:
         logging.warning("No photo found to post.")
     else:
-        summary = result["summary"]
-        id = result["nodeid"]
-        logging.info(f"Random photo summary (photo id: {id}): {summary}")
         photo_id = result["nodeid"]
         image_page_url = f'https://digital.denverlibrary.org/nodes/view/{photo_id}'
 
