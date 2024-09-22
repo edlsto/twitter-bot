@@ -4,7 +4,7 @@ from openai import OpenAI
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def generate_tweet_summary(nodetitle, summary, max_length=253):
-    prompt = f"Create a summary using this summary. Use title if needed:\n\nTitle: {nodetitle}\nSummary: {summary}\n\nSummary (max {max_length} characters):"
+    prompt = f"Reduce this summary to {max_length} characters. \n\nSummary: {summary}:"
 
     try:
         response = client.chat.completions.create(
