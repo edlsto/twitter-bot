@@ -32,6 +32,8 @@ TWEET_MAX_LENGTH = 280
 URL_LENGTH = 23
 DESCRIPTION_MAX_LENGTH = TWEET_MAX_LENGTH - URL_LENGTH
 
+use_ai = True
+
 def post_tweet_with_photo(post_data, twitter_API, client, con):
     image_page_url = post_data['image_page_url']
     summary = post_data['summary']
@@ -153,10 +155,13 @@ def main():
                     try:
                         # Check if the summary is greater than 257 characters
                         if len(result["summary"]) > summary_max_length:
-                            # Attempt to generate a tweet summary using the OpenAI API
-                            summary = generate_tweet_summary(result["nodetitle"], result["summary"], summary_max_length)
-                            if not summary:
-                                logging.warning("Generated summary is None, falling back to the old method.")
+                            if use_ai:
+                                # Attempt to generate a tweet summary using the OpenAI API
+                                summary = generate_tweet_summary(result["nodetitle"], result["summary"], summary_max_length)
+                                if not summary:
+                                    logging.warning("Generated summary is None, falling back to the old method.")
+                                    summary = get_sentences(result["summary"], summary_max_length)
+                            else:
                                 summary = get_sentences(result["summary"], summary_max_length)
                         else:
                             summary = result["summary"]
