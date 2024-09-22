@@ -25,11 +25,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Generate Tweet Summary
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python generate_tweet_summary.py
-
       - name: Run script
         env:
           CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
