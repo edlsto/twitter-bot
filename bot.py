@@ -10,7 +10,7 @@ from db_utils import get_random_photo, record_posted_image
 from string_utils import get_first_sentence, get_sentences, extract_date
 from date_utils import get_current_holiday
 from generate_tweet_summary import generate_tweet_summary
-# from credentials import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET
+# from credentials import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET, DATABASE_URL, OPENAI_API_KEY
 from os import environ
 
 logging.basicConfig(level=logging.INFO)
