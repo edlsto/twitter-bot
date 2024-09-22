@@ -155,13 +155,13 @@ def main():
                         if len(result["summary"]) > summary_max_length:
                             # Attempt to generate a tweet summary using the OpenAI API
                             summary = generate_tweet_summary(result["nodetitle"], result["summary"], summary_max_length)
-                            logger.info(f"Generated AI summary: {summary}")
+                            logging.info(f"Generated AI summary: {summary}")
                         else:
                             # If not, fallback to the old method
                             summary = result["summary"]
                     except Exception as e:
                         # Log the error if needed
-                        logger.error(f"Failed to generate tweet summary: {e}")
+                        logging.error(f"Failed to generate tweet summary: {e}")
                         # Fallback to the old method in case of an error
                         summary = get_sentences(result["summary"], summary_max_length)
 
