@@ -165,7 +165,7 @@ def main():
                         if len(result["summary"]) > summary_max_length:
                             if use_ai:
                                 # Attempt to generate a tweet summary using the OpenAI API
-                                summary = generate_tweet_summary(result["nodetitle"], result["summary"], summary_max_length)
+                                summary = generate_tweet_summary(result["nodetitle"], result["summary"], result["date"], summary_max_length)
                                 if not summary:
                                     logging.warning("Generated summary is None, falling back to the old method.")
                                     summary = get_sentences(result["summary"], summary_max_length)

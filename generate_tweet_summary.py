@@ -9,11 +9,11 @@ logging.basicConfig(level=logging.INFO)
 # client = OpenAI(api_key=OPENAI_API_KEY)
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def generate_tweet_summary(nodetitle, summary, max_length=253):
+def generate_tweet_summary(nodetitle, summary, date, max_length=253):
 
     max_words = max_length // 8
 
-    prompt = f"Please reduce the following photo caption to no more than {max_words} words. This is for a website about Colorado history. Keep as much relevant information as possible while ensuring you do NOT exceed the word limit.\n\nSummary: {summary}:"
+    prompt = f"Please reduce the following photo caption to no more than {max_words} words. This is for a website about Colorado history. Keep as much relevant information as possible while ensuring you do NOT exceed the word limit.\n\nSummary: {summary}\n\nFor additional context here is the title and date of photo. Please note that the date will be added separately, so there is no need to add it to the summary.\n\nTitle: {nodetitle}\n\nDate: {date}"
 
     logging.info(f"Prompt: {prompt}")
 
@@ -30,7 +30,9 @@ def generate_tweet_summary(nodetitle, summary, max_length=253):
         logging.info(f"AI generated summary: {tweet_summary}")
 
         if len(tweet_summary) > max_length:
+            logging.info("Tweet too long... truncating tweet")
             tweet_summary = get_sentences(tweet_summary, max_length)
+            logging.info(f"Truncated tweet: {tweet_summary}")
 
         return tweet_summary
     
