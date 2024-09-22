@@ -1,6 +1,7 @@
 import os
 from openai import OpenAI
 import logging
+from string_utils import get_sentences
 
 logging.basicConfig(level=logging.INFO)
 
@@ -24,10 +25,10 @@ def generate_tweet_summary(nodetitle, summary, max_length=253):
         logging.info(f"AI generated summary: {tweet_summary}")
 
         if len(tweet_summary) > max_length:
-            tweet_summary = tweet_summary[:max_length]
+            tweet_summary = get_sentences(tweet_summary, summary_max_length)
 
         return tweet_summary
     
     except Exception as e:
         print(f"An error occurred: {e}")
-        return None  # Or handle it in a way that fits your application
+        return None
