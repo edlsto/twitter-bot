@@ -44,6 +44,8 @@ def post_tweet_with_photo(post_data, twitter_API, client, con):
         response = client.create_tweet(text=tweet, media_ids=[media.media_id])
         logging.info(f"Tweet made: {tweet}")
 
+        record_posted_image(con, photo_id)
+
         return response
     except Exception as e:
         logging.error(f"Error posting tweet: {e}")
@@ -132,9 +134,6 @@ def main():
     else:
         photo_id = result["nodeid"]
         image_page_url = f'https://digital.denverlibrary.org/nodes/view/{photo_id}'
-
-        if not holiday:
-            record_posted_image(con, photo_id)
 
         # Fetch the image page content
         image_page_content = fetch_image_page(image_page_url)
