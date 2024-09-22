@@ -16,7 +16,7 @@ def get_random_photo(conn, term=None):
         else:
             sql = """
                 SELECT * FROM photos_2024
-                WHERE nodeid = '1125889'
+                WHERE nodeid NOT IN (SELECT nodeid FROM posted_images) AND NOT (date ~ '20[0-9]{2}')
                 ORDER BY random()
                 LIMIT 1
             """
