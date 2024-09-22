@@ -24,7 +24,6 @@ def get_random_photo(conn, term=None):
                 SELECT * FROM photos_2024
                 WHERE nodeid NOT IN (SELECT nodeid FROM posted_images) AND NOT (date ~ '20[0-9]{2}')
                 AND subject NOT LIKE '%Locomotives%' AND subject NOT LIKE '%locomotives%'
-                AND nodeid = '1120594'
                 ORDER BY random()
                 LIMIT 1
             """
