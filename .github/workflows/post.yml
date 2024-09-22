@@ -27,7 +27,7 @@ jobs:
 
       - name: Generate Tweet Summary
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}  # Add your OpenAI API key here
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python generate_tweet_summary.py
 
       - name: Run script

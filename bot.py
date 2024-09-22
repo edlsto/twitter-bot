@@ -125,7 +125,6 @@ def main():
         # Non-holiday period: exclude holiday-related images
         while True:
             result = get_random_photo(con)
-            logging.info(result)
             if result and not is_holiday_image(result):  # Check if the image is NOT holiday-related
                 break  # Only proceed if it's not a holiday-related image
             logging.info("Skipping holiday image for regular tweet.")
