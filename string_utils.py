@@ -9,9 +9,6 @@ def get_first_sentence(string):
         return ""
 
 def get_sentences(string, max_length):
-    last_character = list(string)[-1]
-    if last_character not in (';', '.', '!'):
-      string = string + '.';
       
     result = ""
     char_count = 0
@@ -30,10 +27,7 @@ def get_sentences(string, max_length):
 
     result = result.strip()
 
-    result = s = list(result)
-    if s[-1] == ';':
-        s[-1] = '.'
-    return "".join(s)
+    return result
 
 def extract_date(input_string):
     if input_string is None:
