@@ -8,24 +8,30 @@ def get_random_photo(conn, term=None):
         if term:
             sql = """
                 SELECT * FROM photos_2024 
-                WHERE (summary LIKE %s OR subject LIKE %s) AND nodeid NOT IN (SELECT nodeid FROM posted_images) AND NOT (date ~ '20[0-9]{2}')
+                WHERE (summary LIKE %s OR subject LIKE %s) 
+                AND nodeid NOT IN (SELECT nodeid FROM posted_images) AND NOT (date ~ '20[0-9]{2}')
+                AND subject NOT LIKE '%locomotives%'
                 ORDER BY random()
                 LIMIT 1
             """
-            params = (f"%{term}%", f"%{term}%")
+            params = (f"%{term }%", f"%{term }%")
+
+            with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as dict_cur:
+                dict_cur.execute(sql, params)
+                return dict_cur.fetchone()
         else:
             sql = """
                 SELECT * FROM photos_2024
                 WHERE nodeid NOT IN (SELECT nodeid FROM posted_images) AND NOT (date ~ '20[0-9]{2}')
+                AND subject NOT LIKE '%locomotives%'
                 ORDER BY random()
                 LIMIT 1
             """
             params = ()
 
-        with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as dict_cur:
-            logging.info("Executing SQL query: %s", sql)
-            dict_cur.execute(sql, params)
-            return dict_cur.fetchone()
+            with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as dict_cur:
+                dict_cur.execute(sql)
+                return dict_cur.fetchone()
             
     except Exception as e:
         logging.error(f"Error fetching random photo: {e}")
