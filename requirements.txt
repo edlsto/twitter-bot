@@ -12,6 +12,7 @@ idna==3.4
 jmespath==1.0.1
 numpy==1.26.4
 oauthlib==3.2.2
+openai
 outcome==1.3.0.post0
 packaging==24.0
 pandas==2.2.2
