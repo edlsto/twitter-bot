@@ -8,7 +8,10 @@ logging.basicConfig(level=logging.INFO)
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def generate_tweet_summary(nodetitle, summary, max_length=253):
-    prompt = f"Please reduce the following photo caption to no more than {max_length} characters. This is for a website about Colorado history. Keep as much relevant information as possible while ensuring you do NOT exceed the character limit.\n\nSummary: {summary}:"
+
+    max_words = max_length // 8
+
+    prompt = f"Please reduce the following photo caption to no more than {max_words} words. This is for a website about Colorado history. Keep as much relevant information as possible while ensuring you do NOT exceed the word limit.\n\nSummary: {summary}:"
 
     logging.info(f"Prompt: {prompt}")
 
