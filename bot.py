@@ -149,9 +149,15 @@ def main():
 
                     # add the length of the date, plus a space before and after date
                     summary_max_length = DESCRIPTION_MAX_LENGTH - (len(date) + 2)
-                    # summary = get_sentences(result["summary"], summary_max_length)
 
-                    summary = generate_tweet_summary(result["nodetitle"], result["summary"], summary_max_length)
+                    try:
+                        # Attempt to generate a tweet summary using the OpenAI API
+                        summary = generate_tweet_summary(result["nodetitle"], result["summary"], summary_max_length)
+                    except Exception as e:
+                        # Log the error if needed
+                        print(f"Failed to generate tweet summary: {e}")
+                        # Fallback to the old method
+                        summary = get_sentences(result["summary"], summary_max_length)
 
                     post_data = {
                         'image_page_url': image_page_url,
