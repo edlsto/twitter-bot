@@ -2,12 +2,12 @@ import os
 from openai import OpenAI
 import logging
 from string_utils import get_sentences
-from credentials import OPENAI_API_KEY
+# from credentials import OPENAI_API_KEY
 
 logging.basicConfig(level=logging.INFO)
 
-client = OpenAI(api_key=OPENAI_API_KEY)
-# client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# client = OpenAI(api_key=OPENAI_API_KEY)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def generate_tweet_summary(nodetitle, summary, max_length=253):
 
