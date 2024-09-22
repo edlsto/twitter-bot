@@ -136,6 +136,9 @@ def main():
     if result is None:
         logging.warning("No photo found to post.")
     else:
+        summary = result["summary"]
+        id = result["nodeid"]
+        logging.info(f"Random photo summary (photo id: {id}): {summary}")
         photo_id = result["nodeid"]
         image_page_url = f'https://digital.denverlibrary.org/nodes/view/{photo_id}'
 
