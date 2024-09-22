@@ -147,7 +147,7 @@ def main():
         if image_page_content:
             img_url = get_image_url(image_page_content)
             if img_url:
-                idx_value = img_url.split('-')[1]  # Extract idx_value from the URL
+                idx_value = img_url.split('/')[-1].split('-')[0]
                 
                 # Download the photo
                 if download_image(img_url, idx_value):
