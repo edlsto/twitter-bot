@@ -86,7 +86,7 @@ def download_image(img_url, idx_value):
         return False
 
 def is_holiday_image(photo):
-    holidays_keywords = ["Christmas", "Halloween", "New Year's", "Easter", "Fourth of July", "Thanksgiving"]
+    holidays_keywords = ["Christmas", "New Year's", "Easter", "Fourth of July"]
     summary = photo.get('summary', '').lower()
     subject = photo.get('subject', '').lower()
     
