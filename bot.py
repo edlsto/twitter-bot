@@ -44,6 +44,7 @@ def post_tweet_with_photo(post_data, twitter_API, client, con):
     try:
         media = twitter_API.media_upload(image_path)
         tweet = f"{summary} {date} {image_page_url}"
+        logging.info(f"tweet: {tweet}")
         response = client.create_tweet(text=tweet, media_ids=[media.media_id])
         logging.info(f"Tweet made: {tweet}")
 
