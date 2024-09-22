@@ -7,10 +7,8 @@ def get_current_holiday():
 
     holiday_periods = {
         "Christmas": (datetime.datetime(now.year, 12, 18), datetime.datetime(now.year, 12, 25)),
-        "Halloween": (datetime.datetime(now.year, 10, 31), datetime.datetime(now.year, 10, 31)),
         "New Year's": (datetime.datetime(now.year, 12, 31), datetime.datetime(now.year, 1, 1)),
         "Easter": (datetime.datetime(now.year, easter_month, easter_day), datetime.datetime(now.year, easter_month, easter_day)),  # Easter Sunday
-        "Thanksgiving": (thanksgiving_date, thanksgiving_date + datetime.timedelta(days=1)),  # Thanksgiving Day
         "Fourth of July": (datetime.datetime(now.year, 7, 4), datetime.datetime(now.year, 7, 4))
     }
 
