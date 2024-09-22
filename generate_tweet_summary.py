@@ -7,7 +7,7 @@ logging.basicConfig(level=logging.INFO)
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def generate_tweet_summary(nodetitle, summary, max_length=253):
-    prompt = f"Reduce this summary to no more than {max_length} characters, while providing as much of summary info as possible. \n\nSummary: {summary}:"
+    prompt = f"Please reduce the following summary to no more than {max_length} characters. Keep as much relevant information as possible while ensuring you do not exceed the character limit.\n\nSummary: {summary}:"
 
     logging.info(f"Prompt: {prompt}")
 
