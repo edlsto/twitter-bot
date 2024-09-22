@@ -151,12 +151,17 @@ def main():
                     summary_max_length = DESCRIPTION_MAX_LENGTH - (len(date) + 2)
 
                     try:
-                        # Attempt to generate a tweet summary using the OpenAI API
-                        summary = generate_tweet_summary(result["nodetitle"], result["summary"], summary_max_length)
+                        # Check if the summary is greater than 257 characters
+                        if len(result["summary"]) > summary_max_length:
+                            # Attempt to generate a tweet summary using the OpenAI API
+                            summary = generate_tweet_summary(result["nodetitle"], result["summary"], summary_max_length)
+                        else:
+                            # If not, fallback to the old method
+                            summary = =result["summary"]
                     except Exception as e:
                         # Log the error if needed
-                        print(f"Failed to generate tweet summary: {e}")
-                        # Fallback to the old method
+                        logger.error(f"Failed to generate tweet summary: {e}")
+                        # Fallback to the old method in case of an error
                         summary = get_sentences(result["summary"], summary_max_length)
 
                     post_data = {
