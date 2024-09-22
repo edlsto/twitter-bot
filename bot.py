@@ -157,7 +157,7 @@ def main():
                             summary = generate_tweet_summary(result["nodetitle"], result["summary"], summary_max_length)
                         else:
                             # If not, fallback to the old method
-                            summary = =result["summary"]
+                            summary = result["summary"]
                     except Exception as e:
                         # Log the error if needed
                         logger.error(f"Failed to generate tweet summary: {e}")
