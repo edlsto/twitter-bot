@@ -134,7 +134,7 @@ def main():
         image_page_url = f'https://digital.denverlibrary.org/nodes/view/{photo_id}'
 
         if not holiday:
-            insert_posted_image(con, photo_id)
+            record_posted_image(con, photo_id)
 
         # Fetch the image page content
         image_page_content = fetch_image_page(image_page_url)
