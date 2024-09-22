@@ -16,7 +16,7 @@ def get_random_photo(conn, term=None):
         else:
             sql = """
                 SELECT * FROM photos_2024
-                WHERE nodeid = '1030244'
+                WHERE nodeid = '1125889'
                 ORDER BY random()
                 LIMIT 1
             """
