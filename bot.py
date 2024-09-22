@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 from db_utils import get_random_photo, record_posted_image
 from string_utils import get_first_sentence, get_sentences, extract_date
 from date_utils import get_current_holiday
+from generate_tweet_summary import generate_tweet_summary
 # from credentials import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET
 from os import environ
 
@@ -124,6 +125,7 @@ def main():
         # Non-holiday period: exclude holiday-related images
         while True:
             result = get_random_photo(con)
+            logging.info(result)
             if result and not is_holiday_image(result):  # Check if the image is NOT holiday-related
                 break  # Only proceed if it's not a holiday-related image
             logging.info("Skipping holiday image for regular tweet.")
@@ -148,7 +150,9 @@ def main():
 
                     # add the length of the date, plus a space before and after date
                     summary_max_length = DESCRIPTION_MAX_LENGTH - (len(date) + 2)
-                    summary = get_sentences(result["summary"], summary_max_length)
+                    # summary = get_sentences(result["summary"], summary_max_length)
+
+                    summary = generate_tweet_summary(result["nodetitle"], result["summary"], summary_max_length)
 
                     post_data = {
                         'image_page_url': image_page_url,
