@@ -13,7 +13,7 @@ def generate_tweet_summary(nodetitle, summary, date, max_length=253):
 
     max_words = max_length // 8
 
-    prompt = f"Please reduce the following photo caption to no more than {max_words} words. This is for a website about Colorado history. Keep as much relevant information as possible while ensuring you do NOT exceed the word limit.\n\nSummary: {summary}\n\nFor additional context here is the title and date of photo. Please note that the date will be added separately, so there is no need to add it to the summary.\n\nTitle: {nodetitle}\n\nDate: {date}"
+    prompt = f"Please reduce the following photo caption to no more than {max_words} words. This is for a website about Colorado history. Keep as much relevant information as possible while ensuring you do NOT exceed the word limit. Do not put the summary in quotes, and use double quotes, not single quotes, for all quotes as needed.\n\nSummary: {summary}\n\nFor additional context here is the title and date of photo. Please note that the date will be added separately, so there is no need to add it to the summary.\n\nTitle: {nodetitle}\n\nDate: {date}"
 
     logging.info(f"Prompt: {prompt}")
 
