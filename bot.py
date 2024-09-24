@@ -135,7 +135,7 @@ def main():
 
             summary = result["summary"]
             id = result["nodeid"]
-            logging.info(f"Random photo summary (photo id: {id}): {summary}")
+            logging.info(f"Random photo: nodeid {id}")
             if result and not is_holiday_image(result):  # Check if the image is NOT holiday-related
                 break  # Only proceed if it's not a holiday-related image
             logging.info("Skipping holiday image for regular tweet.")
