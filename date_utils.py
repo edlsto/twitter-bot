@@ -3,7 +3,6 @@ import datetime
 def get_current_holiday():
     now = datetime.datetime.now()
     easter_month, easter_day = calculate_easter(now.year)
-    thanksgiving_date = calculate_thanksgiving(now.year)
 
     holiday_periods = {
         "Christmas": (datetime.datetime(now.year, 12, 18), datetime.datetime(now.year, 12, 25)),
