@@ -10,16 +10,12 @@ def clear_holiday_images(connection):
                 WHERE nodeid IN (
                     SELECT nodeid FROM shared_photos 
                     WHERE subject LIKE '%Christmas%' 
-                       OR subject LIKE '%Halloween%' 
                        OR subject LIKE '%New Year%' 
                        OR subject LIKE '%Easter%' 
-                       OR subject LIKE '%Thanksgiving%' 
                        OR subject LIKE '%Fourth of July%' 
                        OR summary LIKE '%Christmas%' 
-                       OR summary LIKE '%Halloween%' 
                        OR summary LIKE '%New Year%' 
                        OR summary LIKE '%Easter%' 
-                       OR summary LIKE '%Thanksgiving%' 
                        OR summary LIKE '%Fourth of July%' 
                 );
             """
