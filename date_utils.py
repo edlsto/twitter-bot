@@ -36,12 +36,3 @@ def calculate_easter(year):
     month = (h + l - 7 * m + 114) // 31
     day = ((h + l - 7 * m + 114) % 31) + 1
     return month, day
-
-
-def calculate_thanksgiving(year):
-    """Calculate Thanksgiving date for a given year."""
-    # Thanksgiving is the fourth Thursday in November
-    first_of_november = datetime.datetime(year, 11, 1)
-    first_thursday = first_of_november + datetime.timedelta(days=(3 - first_of_november.weekday()) % 7)
-    thanksgiving_date = first_thursday + datetime.timedelta(weeks=3)
-    return thanksgiving_date
