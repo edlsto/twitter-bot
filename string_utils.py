@@ -9,6 +9,7 @@ def get_first_sentence(string):
         return ""
 
 def get_sentences(string, max_length):
+    logging.info("Tweet too long... truncating tweet")
     result = ""
     char_count = 0
     first_sentence = True
@@ -39,6 +40,8 @@ def get_sentences(string, max_length):
             break
 
         first_sentence = False  # Only allow truncation for the first sentence
+
+    logging.info(f"Truncated tweet: {result}")
 
     return result
 

@@ -162,6 +162,7 @@ def main():
 
                     try:
                         if len(result["summary"]) > summary_max_length:
+                            logging.info(f"Summary length ({len(result["summary"])} words) exceeds summary max length ({summary_max_length} words)")
                             if use_ai:
                                 # Attempt to generate a tweet summary using the OpenAI API
                                 summary = generate_tweet_summary(result["nodetitle"], result["summary"], result["date"], summary_max_length)
