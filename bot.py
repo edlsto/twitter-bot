@@ -35,6 +35,10 @@ DESCRIPTION_MAX_LENGTH = TWEET_MAX_LENGTH - URL_LENGTH
 use_ai = True
 
 def twitter_auth():
+    """
+    Handles Twitter API authentication for both v1 and v2.
+    Returns the Twitter API and client objects.
+    """
     # v1 auth
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
@@ -50,6 +54,10 @@ def twitter_auth():
     return twitter_API, client
 
 def post_tweet_with_photo(post_data, twitter_API, client, con):
+    """
+    Posts a tweet with an image.
+    Takes in post_data dictionary, Twitter API objects, and database connection.
+    """
     image_page_url = post_data['image_page_url']
     summary = post_data['summary']
     date = post_data['date']
@@ -70,6 +78,10 @@ def post_tweet_with_photo(post_data, twitter_API, client, con):
         return None
 
 def fetch_image_page(image_page_url):
+    """
+    Fetches the HTML content of an image page.
+    Returns the content if successful, otherwise returns None.
+    """
     try:
         response = requests.get(image_page_url)
         response.raise_for_status()
@@ -79,6 +91,10 @@ def fetch_image_page(image_page_url):
         return None
 
 def get_image_url(image_page_content):
+    """
+    Parses the HTML content to find the image URL.
+    Returns the image URL if found, otherwise None.
+    """
     soup = BeautifulSoup(image_page_content, 'html.parser')
     viewport_div = soup.find('div', id='viewport')
     if viewport_div:
@@ -89,6 +105,10 @@ def get_image_url(image_page_content):
     return None
 
 def download_image(img_url, idx_value):
+    """
+    Downloads the image from the given URL and saves it locally.
+    Returns True if successful, otherwise False.
+    """
     try:
         response = requests.get(img_url)
         response.raise_for_status()
@@ -100,6 +120,10 @@ def download_image(img_url, idx_value):
         return False
 
 def is_holiday_image(photo):
+    """
+    Checks if the given photo is related to any holiday based on keywords.
+    Returns True if it matches a holiday keyword, otherwise False.
+    """
     holidays_keywords = ["Christmas", "New Year's", "Easter", "Fourth of July"]
     summary = photo.get('summary', '').lower()
     subject = photo.get('subject', '').lower()
@@ -107,6 +131,10 @@ def is_holiday_image(photo):
     return any(holiday.lower() in summary or holiday.lower() in subject for holiday in holidays_keywords)
 
 def get_holiday_photo(con, holiday, now):
+    """
+    Retrieves a holiday-related photo from the database.
+    If no holiday photo is found, a random photo is retrieved instead.
+    """
     if now.hour % 4 == 0:
         result = get_random_photo(con, holiday)
         logging.info(f"In holiday period for {holiday}: Selected image for {holiday}.")
@@ -198,6 +226,10 @@ def process_and_post_image(result, image_page_url, use_ai, twitter_API, client, 
     post_image_tweet(result, img_url, image_page_url, idx_value, summary_max_length, use_ai, twitter_API, client, con)
 
 def connect_to_database():
+    """
+    Connects to the PostgreSQL database.
+    Raises an exception if the connection fails.
+    """
     try:
         return psycopg2.connect(DATABASE_URL, sslmode='require')
     except Exception as e:
@@ -206,6 +238,10 @@ def connect_to_database():
     # con = psycopg2.connect(database="historic_photos", user="edwardstoner", password="", host="127.0.0.1", port="5432")
 
 def get_photo_for_posting(con, now):
+    """
+    Retrieves an appropriate photo for posting.
+    If a holiday is ongoing, attempts to get a holiday-themed photo.
+    """
     holiday = get_current_holiday()
 
     if holiday and now.hour % 4 == 0:
