@@ -1,4 +1,7 @@
 import re
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 def get_first_sentence(string):
     m = re.search('^.*?[\.!;](?:\s|$)(?<=[^ ]{4,4}[\.!;]\s)', string + ' ')
