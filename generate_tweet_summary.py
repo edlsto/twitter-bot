@@ -33,7 +33,7 @@ def generate_tweet_summary(nodetitle, summary, date, max_length=253):
         logging.info(f"Length: {len(tweet_summary)}")
 
         if len(tweet_summary) > max_length:
-            logging.inf(f"Length of AI-generated summary: ({len(tweet_summary)}) exceeds max length: ({max_length})")
+            logging.info(f"Length of AI-generated summary: ({len(tweet_summary)}) exceeds max length: ({max_length})")
             tweet_summary = get_sentences(tweet_summary, max_length)
 
         return tweet_summary
