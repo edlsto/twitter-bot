@@ -178,7 +178,7 @@ def handle_summary_length(result, summary_max_length, use_ai):
                     logging.warning("Generated summary is None, falling back to truncation.")
                     return get_sentences(result["summary"], summary_max_length)
 
-            return get_sentences(result["summary"], summary_max_length)
+            return summary
         
         return summary
     except Exception as e:
